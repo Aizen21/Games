@@ -78,6 +78,33 @@ class Human(GameObject):
         self._desc = value
 
 
+class Elf(GameObject):
+    def __init__(self, name):
+        self.class_name = "elf"
+        self.health = 15
+        self._desc = "Melancholic and mystic creatures. Usually shines."
+        super().__init__(name)
+
+    @property
+    def desc(self):
+        health_line = ""
+        if 12 <= self.health <= 15:
+            return self._desc
+        elif 8 <= self.health <= 11:
+            health_line = "He is not shining any more."
+        elif 4 <= self.health <= 7:
+            health_line = "He is bleeding a lot... in blue!"
+        elif 1 <= self.health <= 3:
+            health_line = "He has not hands. He can't use his bow."
+        elif self.health == 0:
+            health_line = "He is dead (Oddly he's shining again)."
+        return self._desc + "\n" + health_line
+
+    @desc.setter
+    def desc(self, value):
+        self._desc = value
+
+
 def hit(noun):
     if noun in GameObject.objects:
         thing = GameObject.objects[noun]
@@ -116,6 +143,20 @@ def hit(noun):
             else:
                 msg += "You hit the {}. ".format(thing.class_name)
             msg += "Health = " + str(thing.health)
+
+        elif type(thing) == Elf:
+            if thing.health == 0:
+                return "It is dead. You can't hit him any more."
+            thing.health -= damage
+            if thing.health <= 0:
+                thing.health = 0
+                msg += "You killed the {}! . ".format(thing.class_name)
+            elif damage == 0:
+                pass
+            else:
+                msg += "You hit the {}. ".format(thing.class_name)
+            msg += "Health = " + str(thing.health)
+            
         else:
             msg = "There is no {} here.".format(thing.class_name)
         return msg
@@ -140,7 +181,7 @@ def examine(noun):
 
 
 action_dict = {"examine": examine, "hit": hit, "new": new, "exit": quit}
-race_dict = {"goblin": Goblin, "human": Human}
+race_dict = {"goblin": Goblin, "human": Human, "elf": Elf}
 justOnce = 1
 while True:
     intro = "daGame".center(80, '*')
