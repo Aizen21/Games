@@ -6,10 +6,12 @@ def procesar():
     action_word = command[0]
     if action_word in action_dict:
         action = action_dict[action_word]
-        if command[0] != 'exit':
+        if len(command) == 2:
             print(action(command[1]))
-        else:
+        elif command[0] == 'exit':
             print(action('Bye bye'))
+        elif len(command) == 1:
+            print(action())
     else:
         print("Unknown action {}".format(action_word))
         return
@@ -31,18 +33,18 @@ class GameObject:
 class Goblin(GameObject):
     def __init__(self, name):
         self.class_name = "goblin"
-        self.health = 3
+        self.health = 12
         self._desc = "A foul creature"
         super().__init__(name)
 
     @property
     def desc(self):
         health_line = ""
-        if self.health >= 3:
+        if 12 >= self.health >= 9:
             return self._desc
-        elif self.health == 2:
+        elif 8 >= self.health >= 5:
             health_line = "It has a wound on its knee."
-        elif self.health == 1:
+        elif 4 >= self.health >= 1:
             health_line = "Its left arm has been cut off!"
         elif self.health == 0:
             health_line = "It is dead."
@@ -180,21 +182,29 @@ def examine(noun):
         return "There is no {} here.".format(noun)
 
 
-action_dict = {"examine": examine, "hit": hit, "new": new, "exit": quit}
+def dice():
+    return "Your roll is " + str(rnd(1,6))
+
+
+action_dict = {"examine": examine, "hit": hit, "new": new, "exit": quit, "roll": dice}
 race_dict = {"goblin": Goblin, "human": Human, "elf": Elf}
 justOnce = 1
 while True:
     intro = "daGame".center(80, '*')
     intro += """
-    Este es un juego de prueba en el que tu puedes hacer solo tres cosas: 
+    Este es un juego para competir con tus amigos. Cada quien elige un
+    personaje, se tira el dado para ver quién golpea primero, el primero que
+    mate al otro gana :D
+    Instrucciones:
     1.- Crear un nuevo personaje (new 'personaje') que puede ser
-        un goblin o un human (puedes tener hasta dos personajes a la vez).
+        un goblin/human/elf (como máximo puede haber 3 jugadores a la vez).
         En cualquier momento puedes crear un personaje nuevo, esto resetea sus
         stats (no se pueden tener dos personajes del mismo tipo).
     2.- Examinar un personaje (examine 'personaje') para ver su
         estatus.
     3.- Golpear un personaje (hit 'personaje') solo por diversión.
-    Para salir sólo escribe exit."""
+    4.- Tirar el dado (roll).
+    5.- Salir (exit)."""
     while justOnce:
         print(intro)
         justOnce -= 1
